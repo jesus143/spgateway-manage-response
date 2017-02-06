@@ -14,9 +14,7 @@
  * @author  Spgateway Geoff
  */
 
-
 add_shortcode('spgateway_payment_response', 'spgateway_payment_response_func');
-
 
 require_once(ABSPATH . "wp-includes/post.php");
 function spgateway_payment_response_func()
@@ -36,23 +34,20 @@ function spgateway_payment_response_func()
     //        PRINT_R($_COOKIE);
     //    print "</pre>";
 
-    $product_id = $_SESSION['spgateway_args']['Pid1'];
-    $status     = strtolower($_POST['Status']);
-    $orderId    = $_POST['MerchantOrderNo'];
-    $message    = $_POST['Message'];
+    //    $product_id = $_SESSION['spgateway_args']['Pid1'];
+    //    $status     = strtolower($_POST['Status']);
+    //    $orderId    = $_POST['MerchantOrderNo'];
+    //    $message    = $_POST['Message'];
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// send right registration /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
     spgateway_mr_add_create_sendright_account($paymentGateway);
 
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// clean item and set product to processing /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
     spgateway_mr_set_order_processing_and_empty_cart($status, $orderId, $message);
-
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// redirect to thank you page /////////////////////////////////
@@ -95,6 +90,7 @@ function spgateway_mr_set_order_processing_and_empty_cart($status, $orderId, $me
 }
 
 function spgateway_mr_redirect_to_thankyou_page($product_id) {
+
     $thank_you_page_id = get_post_meta($product_id, 'thankyou_page', true);
     $post_7 = get_post( $thank_you_page_id );
     $url = $post_7->guid;
@@ -102,10 +98,13 @@ function spgateway_mr_redirect_to_thankyou_page($product_id) {
 
     ?>
         <script>
-            setTimeout(
-                function(){
+
+//            setTimeout(
+//                function(){
                     document.location ='<?php print $url; ?>';
-                },3000);
+//                },3000);
+
+
         </script>
 
     <?php
