@@ -13,14 +13,14 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-     print "<pre>";
-         print "post";
-         print_r($_POST);
-         print "session";
-         PRINT_R($_SESSION);
-         print "cookie";
-         PRINT_R($_COOKIE);
-     print "</pre>";
+    //     print "<pre>";
+    //         print "post";
+    //         print_r($_POST);
+    //         print "session";
+    //         PRINT_R($_SESSION);
+    //         print "cookie";
+    //         PRINT_R($_COOKIE);
+    //     print "</pre>";
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
@@ -187,12 +187,9 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
         //        // print_r($testData);
         //        print_r($data->post_data_array);
         //        print "</pre>";
-
-
-    $data->postInvoice();
-
-    print "exit???";
-    //     exit;
+        $data->postInvoice();
+        //    print "exit???";
+        //     exit;
 }
 
 
