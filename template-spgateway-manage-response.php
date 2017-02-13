@@ -47,7 +47,7 @@ function spgateway_payment_response_func_theme()
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// redirect to thank you page /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
-//    spgateway_mr_redirect_to_thankyou_page_theme($product_id);
+    spgateway_mr_redirect_to_thankyou_page_theme($product_id);
 }
 
 
@@ -76,7 +76,11 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
 
     $order = new WC_Order($orderId);
 
+    //    print " billing company = " . $order->billing_company;
+    //    print " billing uniform numbers = " . $order->billing_uniform_numbers;
+    //    print " billing first name = " . $order->billing_first_name;
 
+//    exit;
     //    print " billing address " . $order->get_address();
     //
     //
@@ -97,6 +101,9 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
 
     // print " get total ammount " . $order->get_total();
 
+
+    $buyerUbn = '';
+
     if($data->taxtype == 1) {
         $TaxRatePercent = 0.05;
         $TaxType = 1;
@@ -108,11 +115,21 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
         $TaxType = 2;
     }
 
+    if(!empty($order->billing_company) and !empty($order->billing_uniform_numbers)) {
+        $Category = 'B2B';
+        $buyerName = $order->billing_company;
+        $buyerUbn  = $order->billing_uniform_numbers;
+
+    } else {
+        $buyerName = $order->billing_first_name;
+        $Category  = 'B2C';
+    }
+
 
     $billingAddressArray = $order->get_address();
     $count = $session['Count'];
-    $BuyerUBN = '99112233';
-    $Category = "B2B";
+    //    $BuyerUBN = '99112233';
+    //    $Category = "B2B";
     $TaxRate = ($data->taxtype == 1) ? 5 : 0;
     $Amt   =  $order->get_total() - ($order->get_total() * $TaxRatePercent); //490;
     $TaxAmt = ($order->get_total() * $TaxRatePercent);
@@ -138,8 +155,8 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
         "TimeStamp" => time(), //請以  time()  格式
         "TransNum" => $post['TradeNo'],
         "MerchantOrderNo" => $post['MerchantOrderNo'],  //"201409170000009",
-        "BuyerName" => $order->get_formatted_billing_full_name(),
-        "BuyerUBN" => $BuyerUBN,
+        "BuyerName" =>$buyerName, ///$order->get_formatted_billing_full_name(),
+        "BuyerUBN" => $buyerUbn,
         "BuyerAddress" => $BuyerAddress,
         "BuyerEmail" => $order->billing_email,
         "BuyerPhone" => $order->billing_phone,
@@ -165,16 +182,17 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     ];
 
     $data->setParameter($testData);
-
-    //    print "<pre>";
-    //    // print_r($testData);
-    //    print_r($data->post_data_array);
-    //    print "</pre>";
+        //
+        //        print "<pre>";
+        //        // print_r($testData);
+        //        print_r($data->post_data_array);
+        //        print "</pre>";
 
 
     $data->postInvoice();
 
-     exit;
+    print "exit???";
+    //     exit;
 }
 
 
