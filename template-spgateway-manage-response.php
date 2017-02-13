@@ -13,14 +13,14 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-    // print "<pre>";
-    //     print "post";
-    //     print_r($_POST);
-    //     print "session";
-    //     PRINT_R($_SESSION);
-    //     print "cookie";
-    //     PRINT_R($_COOKIE);
-    // print "</pre>";
+     print "<pre>";
+         print "post";
+         print_r($_POST);
+         print "session";
+         PRINT_R($_SESSION);
+         print "cookie";
+         PRINT_R($_COOKIE);
+     print "</pre>";
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
@@ -47,7 +47,7 @@ function spgateway_payment_response_func_theme()
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// redirect to thank you page /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
-    spgateway_mr_redirect_to_thankyou_page_theme($product_id);
+//    spgateway_mr_redirect_to_thankyou_page_theme($product_id);
 }
 
 
@@ -64,23 +64,23 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     //    exit;
 
 
-//    print "<pre>";
-//
-//    print " session <br>";
-//    print_r($session);
-//    print "<br> post <br>";
-//    print_r($post);
-//
-//    print "</pre>";
+    //    print "<pre>";
+    //
+    //    print " session <br>";
+    //    print_r($session);
+    //    print "<br> post <br>";
+    //    print_r($post);
+    //
+    //    print "</pre>";
     //
 
     $order = new WC_Order($orderId);
 
 
-//    print " billing address " . $order->get_address();
-//
-//
-//    exit;
+    //    print " billing address " . $order->get_address();
+    //
+    //
+    //    exit;
 
 
     /**
@@ -97,7 +97,6 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
 
     // print " get total ammount " . $order->get_total();
 
-
     if($data->taxtype == 1) {
         $TaxRatePercent = 0.05;
         $TaxType = 1;
@@ -108,6 +107,7 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
         $TaxRatePercent = 0;
         $TaxType = 2;
     }
+
 
     $billingAddressArray = $order->get_address();
     $count = $session['Count'];
@@ -129,7 +129,7 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     $Comment = "";
     $Status = "1";
     $CreateStatusTime = '';
-    $NotifyEmail =  "1";
+    $NotifyEmail =   ($data->enable === true) ? 1 : 0;
     $BuyerAddress = $billingAddressArray['address_1']; //. ', ' . $billingAddressArray['address_2'] . ', ' .  $billingAddressArray['city'] . ', ' .  $billingAddressArray['city'] . ', ' .  $billingAddressArray['postcode'] . ', ' . $billingAddressArray['country'];
 
     $testData = [
@@ -165,13 +165,16 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     ];
 
     $data->setParameter($testData);
+
     //    print "<pre>";
     //    // print_r($testData);
     //    print_r($data->post_data_array);
     //    print "</pre>";
 
+
     $data->postInvoice();
-    // exit;
+
+     exit;
 }
 
 
