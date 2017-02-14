@@ -60,46 +60,14 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     $session  = $_SESSION['spgateway_args'];
     $post     = $_POST;
 
-
-    //    exit;
-
-
     //    print "<pre>";
-    //
     //    print " session <br>";
     //    print_r($session);
     //    print "<br> post <br>";
     //    print_r($post);
-    //
     //    print "</pre>";
-    //
 
     $order = new WC_Order($orderId);
-
-    //    print " billing company = " . $order->billing_company;
-    //    print " billing uniform numbers = " . $order->billing_uniform_numbers;
-    //    print " billing first name = " . $order->billing_first_name;
-
-//    exit;
-    //    print " billing address " . $order->get_address();
-    //
-    //
-    //    exit;
-
-
-    /**
-     * BuyerUBN
-     * Category
-     * TaxType
-     * TaxRate
-     * Amt
-     */
-
-    //    print " taxt type " . $data->taxtype;
-    //    exit;
-    //    $taxType = '1';
-
-    // print " get total ammount " . $order->get_total();
 
 
     $buyerUbn = '';
@@ -128,8 +96,6 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
 
     $billingAddressArray = $order->get_address();
     $count = $session['Count'];
-    //    $BuyerUBN = '99112233';
-    //    $Category = "B2B";
     $TaxRate = ($data->taxtype == 1) ? 5 : 0;
     $Amt   =  $order->get_total() - ($order->get_total() * $TaxRatePercent); //490;
     $TaxAmt = ($order->get_total() * $TaxRatePercent);
@@ -182,14 +148,13 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     ];
 
     $data->setParameter($testData);
-        //
-        //        print "<pre>";
-        //        // print_r($testData);
-        //        print_r($data->post_data_array);
-        //        print "</pre>";
+        // print "<pre>";
+        // print_r($testData);
+        // print_r($data->post_data_array);
+        // print "</pre>";
         $data->postInvoice();
-        //    print "exit???";
-        //     exit;
+        // print "exit???";
+        // exit;
 }
 
 
@@ -197,7 +162,6 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
 function spgateway_separate_order_results($count, $fieldName, $post) {
 
     $str = '';
-
 
     // print " count  $count field name  $fieldName ";
 
@@ -220,12 +184,10 @@ function spgateway_separate_order_results($count, $fieldName, $post) {
             $str .= '|';
         }
     }
-
-
-
     // print " str compose " . $str;
     return $str;
 }
+
 function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message)
 {
     if ($status == 'success') {
