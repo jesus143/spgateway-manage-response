@@ -13,14 +13,14 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-    //     print "<pre>";
-    //         print "post";
-    //         print_r($_POST);
-    //         print "session";
-    //         PRINT_R($_SESSION);
-    //         print "cookie";
-    //         PRINT_R($_COOKIE);
-    //     print "</pre>";
+     print "<pre>";
+         print "post";
+         print_r($_POST);
+         print "session";
+         PRINT_R($_SESSION);
+         print "cookie";
+         PRINT_R($_COOKIE);
+     print "</pre>";
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
@@ -31,8 +31,11 @@ function spgateway_payment_response_func_theme()
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// send right registration /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
-    spgateway_mr_add_create_sendright_account_theme($paymentGateway);
+    payshortcut_create_member_and_order();
 
+
+
+    exit;
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// clean item and set product to processing /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,8 +160,6 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
         // exit;
 }
 
-
-
 function spgateway_separate_order_results($count, $fieldName, $post) {
 
     $str = '';
@@ -232,11 +233,48 @@ function spgateway_mr_redirect_to_thankyou_page_theme($product_id) {
     <?php
 }
 
-function spgateway_mr_add_create_sendright_account_theme($paymentGateway)
+function payshortcut_create_member_and_order()
 {
-    if($paymentGateway == 'spgateway credit card payment way') {
-        // check if sendright and add registration to sendright
-        // say please whait while registering your account to
-    }
 
+    $postMember = [
+        'first_name' =>  '1eJesus Erwin',
+        'last_name' =>  '1weSuarez',
+        'email' =>  'mrjesuserwinsuarez@gmail.com',
+        'telephone' =>  '+639069262984',
+        'country' =>  'Philippines',
+        'post_code' =>  '9200',
+        'address' =>  'Mimbalot Buru un, Iligan City',
+        'look_up' =>  'Nothing to look up',
+        'uniform_number' =>  '1234567890',
+        'status' => 'subscribed',
+    ];
+
+    $postOrder = [
+        'status' => 'success',
+        'merchant_id' => '1234567',
+        'version' => '1.1',
+        'response_type' => 'String',
+        'check_value' => '1234456789',
+        'time_stamp' => date("Y-m-d h:i:s"),
+        'merchant_order_no' => '123',
+        'amt' => '100',
+        'hash_key' => '1234dasda',
+        'hash_iv' => 'ASD123',
+        'trade_no' => '12321',
+        'token_value' => '2asdasd',
+        'token_life' => '1233232',
+    ];
+
+    $payShortCut = new PayShortCut();
+
+    $response = $payShortCut->createOrUpdateMemberAndCreateOrder(
+        $postMember,
+        $postOrder
+    );
+
+    print "<pre>";
+    print "<br>response information <br>";
+    print_r($response);
+
+    return $response;
 }
