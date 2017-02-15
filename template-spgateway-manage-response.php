@@ -13,14 +13,14 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-    //     print "<pre>";
-    //         print "post";
-    //         print_r($_POST);
-    //         print "session";
-    //         PRINT_R($_SESSION);
-    //         print "cookie";
-    //         PRINT_R($_COOKIE);
-    //     print "</pre>";
+//     print "<pre>";
+//         print "post";
+//         print_r($_POST);
+//         print "session";
+//         PRINT_R($_SESSION);
+//         print "cookie";
+//         PRINT_R($_COOKIE);
+//     print "</pre>";
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
@@ -32,6 +32,7 @@ function spgateway_payment_response_func_theme()
     ////////////////// send right registration /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
     payshortcut_create_member_and_order();
+
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,13 +150,13 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     ];
 
     $data->setParameter($testData);
-    // print "<pre>";
-    // print_r($testData);
-    // print_r($data->post_data_array);
-    // print "</pre>";
-    $data->postInvoice();
-    // print "exit???";
-    // exit;
+        // print "<pre>";
+        // print_r($testData);
+        // print_r($data->post_data_array);
+        // print "</pre>";
+        $data->postInvoice();
+        // print "exit???";
+        // exit;
 }
 
 function spgateway_separate_order_results($count, $fieldName, $post) {
@@ -230,7 +231,7 @@ function spgateway_mr_redirect_to_thankyou_page_theme($product_id) {
     // $post_7 = get_post( $thank_you_page_id );
     // $url = $post_7->guid;
     // print "redirect to url $url";
-    // exit;
+//     exit;
     ?>
     <script>
         //            setTimeout(
@@ -292,10 +293,9 @@ function payshortcut_create_member_and_order()
         $postOrder
     );
 
-    //    print "<pre>";
-    //    print "<br>response information <br>";
-    //    print_r($postOrder);
-    //    print_r($response);
-
+//    print "<pre>";
+//    print "<br>response information <br>";
+//    print_r($postOrder);
+//    print_r($response);
     return $response;
 }
