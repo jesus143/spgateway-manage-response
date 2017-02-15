@@ -13,14 +13,14 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-     print "<pre>";
-         print "post";
-         print_r($_POST);
-         print "session";
-         PRINT_R($_SESSION);
-         print "cookie";
-         PRINT_R($_COOKIE);
-     print "</pre>";
+    //     print "<pre>";
+    //         print "post";
+    //         print_r($_POST);
+    //         print "session";
+    //         PRINT_R($_SESSION);
+    //         print "cookie";
+    //         PRINT_R($_COOKIE);
+    //     print "</pre>";
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
@@ -34,8 +34,6 @@ function spgateway_payment_response_func_theme()
     payshortcut_create_member_and_order();
 
 
-
-    exit;
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// clean item and set product to processing /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,13 +149,13 @@ function spgateway_pay2go_invoice_trigger_invoice($orderId) {
     ];
 
     $data->setParameter($testData);
-        // print "<pre>";
-        // print_r($testData);
-        // print_r($data->post_data_array);
-        // print "</pre>";
-        $data->postInvoice();
-        // print "exit???";
-        // exit;
+    // print "<pre>";
+    // print_r($testData);
+    // print_r($data->post_data_array);
+    // print "</pre>";
+    $data->postInvoice();
+    // print "exit???";
+    // exit;
 }
 
 function spgateway_separate_order_results($count, $fieldName, $post) {
@@ -184,9 +182,19 @@ function spgateway_separate_order_results($count, $fieldName, $post) {
         if ($i != $count) {
             $str .= '|';
         }
+
+//        print " field name $fieldName i $i count $count ";
     }
-    // print " str compose " . $str;
+//     print " str compose  1 " . $str . ' count ' . $count . ' field name ' . $fieldName;
+
+//    exit;
+
+//    print " title " . $str ;
+
+
+
     return $str;
+
 }
 
 function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message)
@@ -236,33 +244,45 @@ function spgateway_mr_redirect_to_thankyou_page_theme($product_id) {
 function payshortcut_create_member_and_order()
 {
 
+    $orderId    = $_POST['MerchantOrderNo'];
+    $session    = $_SESSION;
+    $post       = $_POST;
+    $count      = $session['spgateway_args']['Count'];
+
+    $order      = new WC_Order($orderId);
+
     $postMember = [
-        'first_name' =>  '1eJesus Erwin',
-        'last_name' =>  '1weSuarez',
-        'email' =>  'mrjesuserwinsuarez@gmail.com',
-        'telephone' =>  '+639069262984',
-        'country' =>  'Philippines',
-        'post_code' =>  '9200',
-        'address' =>  'Mimbalot Buru un, Iligan City',
-        'look_up' =>  'Nothing to look up',
-        'uniform_number' =>  '1234567890',
+        'first_name' => $order->billing_first_name,
+        'last_name' => $order->billing_last_name,
+        'email' =>   $order->billing_email, //'mrjesuserwinsuarez@gmail.com',
+        'telephone' => $order->billing_phone, // '+639069262984',
+        'country' =>  $order->billing_country, // 'Philippines',
+        'post_code' => $order->billing_postcode,  //'9200',
+        'address' =>  $order->billing_address_1, // 'Mimbalot Buru un, Iligan City',
+        'look_up' =>  $order->billing_company, // 'Nothing to look up',
+        'uniform_number' =>  $order->billing_uniform_numbers, // '1234567890',
         'status' => 'subscribed',
     ];
 
     $postOrder = [
-        'status' => 'success',
-        'merchant_id' => '1234567',
-        'version' => '1.1',
-        'response_type' => 'String',
-        'check_value' => '1234456789',
-        'time_stamp' => date("Y-m-d h:i:s"),
-        'merchant_order_no' => '123',
-        'amt' => '100',
-        'hash_key' => '1234dasda',
-        'hash_iv' => 'ASD123',
-        'trade_no' => '12321',
-        'token_value' => '2asdasd',
-        'token_life' => '1233232',
+        'status' => $post['Message'] . ' - ' . $post['Status'], // 'success',
+        'merchant_id' => $post['MerchantID'], //'1234567',
+        'title' => spgateway_separate_order_results($count, 'Title', $session['spgateway_args']) ,
+        'description' =>  '',
+        'version' =>  '1.1',
+        'response_type' => $post['RespondType'], //'String',
+        'check_value' => $session['spgateway_args']['CheckValue'], //'1234456789',
+        'time_stamp' => $session['spgateway_args']['TimeStampdate'], //("Y-m-d h:i:s"),
+        'merchant_order_no' =>$post['MerchantOrderNo'], // '123',
+        'amt' => $post['Amt'], //'100',
+        'hash_key' => '', //$post['Amt'],  //'1234dasda',
+        'hash_iv' =>  '', //'ASD123',
+        'trade_no' => $post['TradeNo'],// '12321',
+        'token_value' => $post['TokenValue'], //'2asdasd',
+        'token_life' => $post['TokenLife'], // '1233232',
+        'content_post' => serialize($post),
+        'content_session' => serialize($session),
+
     ];
 
     $payShortCut = new PayShortCut();
@@ -272,9 +292,10 @@ function payshortcut_create_member_and_order()
         $postOrder
     );
 
-    print "<pre>";
-    print "<br>response information <br>";
-    print_r($response);
+    //    print "<pre>";
+    //    print "<br>response information <br>";
+    //    print_r($postOrder);
+    //    print_r($response);
 
     return $response;
 }
