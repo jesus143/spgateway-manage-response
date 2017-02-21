@@ -99,10 +99,10 @@ function spgateway_mr_redirect_to_thankyou_page($product_id) {
     ?>
         <script>
 
-//            setTimeout(
-//                function(){
-                    document.location ='<?php print $url; ?>';
-//                },3000);
+            //            setTimeout(
+            //                function(){
+                                document.location ='<?php print $url; ?>';
+            //                },3000);
 
 
         </script>

@@ -3,6 +3,9 @@
  * Template Name: Spgateway Manage Response
  */
 
+require_once( ABSPATH . "wp-content/plugins/cw-pay2go-ei/includes/class-cw-pay2goe-ei-spgateway.php" );
+require_once( ABSPATH . "wp-content/plugins/cw-pay2go-ei/includes/helper.php" );
+
 spgateway_payment_response_func_theme();
 
 function spgateway_payment_response_func_theme()
@@ -13,19 +16,41 @@ function spgateway_payment_response_func_theme()
     $product_id     = 197;
     $message        = 'Authenticated';
 
-//     print "<pre>";
-//         print "post";
-//         print_r($_POST);
-//         print "session";
-//         PRINT_R($_SESSION);
-//         print "cookie";
-//         PRINT_R($_COOKIE);
-//     print "</pre>";
+    //     print "<pre>";
+    //         print "post";
+    //         print_r($_POST);
+    //         PRINT_R($_SESSION);
+    //         print "cookie";
+    //         PRINT_R($_COOKIE);
+    //     print "</pre>";
+    //    print "session";
+
+
 
     $product_id = $_SESSION['spgateway_args']['Pid1'];
     $status     = strtolower($_POST['Status']);
     $orderId    = $_POST['MerchantOrderNo'];
     $message    = $_POST['Message'];
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// save session and post to wp_postmeta /////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    $key_1_value = get_post_meta( $orderId, '_order_spgateway_response_session', true );
+    if (  empty( $key_1_value ) ) {
+        add_post_meta( $orderId, '_order_spgateway_response_session', serialize($_SESSION) );
+    } else {
+        update_post_meta($orderId, '_order_spgateway_response_session', serialize($_SESSION) );
+    }
+
+    $key_1_value = get_post_meta( $orderId, '_order_spgateway_response_post', true );
+    if (  empty( $key_1_value ) ) {
+        add_post_meta( $orderId, '_order_spgateway_response_post', serialize($_POST) );
+    }else {
+        update_post_meta($orderId, '_order_spgateway_response_session', serialize($_SESSION) );
+    }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,167 +60,29 @@ function spgateway_payment_response_func_theme()
 
 
 
+
+
+    //    exit;
+
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// clean item and set product to processing /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
     spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message);
 
-    /**
-     * Invoice pay2go
-     */
 
-    spgateway_pay2go_invoice_trigger_invoice($orderId);
+
+
+    /**
+     * Send invoice to customer when settings is when order is processing
+     */
+    helper_spgateway_pay2go_invoice_trigger_invoice($orderId, $_SESSION, $_POST);
+
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////// redirect to thank you page /////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////
     spgateway_mr_redirect_to_thankyou_page_theme($product_id);
-}
-
-
-function spgateway_pay2go_invoice_trigger_invoice($orderId) {
-
-    require ABSPATH . '/wp-content/plugins/cw-pay2go-ei/includes/class-cw-pay2goe-ei-spgateway.php';
-    $date = new DateTime();
-    $data = new CWP2GEI_SPGATEWAY();
-
-    $session  = $_SESSION['spgateway_args'];
-    $post     = $_POST;
-
-    //    print "<pre>";
-    //    print " session <br>";
-    //    print_r($session);
-    //    print "<br> post <br>";
-    //    print_r($post);
-    //    print "</pre>";
-
-    $order = new WC_Order($orderId);
-
-
-    $buyerUbn = '';
-
-    if($data->taxtype == 1) {
-        $TaxRatePercent = 0.05;
-        $TaxType = 1;
-    } else if ($data->taxtype == 1.1) {
-        $TaxRatePercent = 0;
-        $TaxType = 2;
-    } else {
-        $TaxRatePercent = 0;
-        $TaxType = 2;
-    }
-
-    if(!empty($order->billing_company) and !empty($order->billing_uniform_numbers)) {
-        $Category = 'B2B';
-        $buyerName = $order->billing_company;
-        $buyerUbn  = $order->billing_uniform_numbers;
-
-    } else {
-        $buyerName = $order->billing_first_name;
-        $Category  = 'B2C';
-    }
-
-
-    $billingAddressArray = $order->get_address();
-    $count = $session['Count'];
-    $TaxRate = ($data->taxtype == 1) ? 5 : 0;
-    $Amt   =  $order->get_total() - ($order->get_total() * $TaxRatePercent); //490;
-    $TaxAmt = ($order->get_total() * $TaxRatePercent);
-    $TotalAmt =  $order->get_total(); //500;
-    $CarrierType = '';
-    $CarrierNum = rawurlencode("");
-    $LoveCode = '';
-    $PrintFlag = "Y";
-    $ItemName =   spgateway_separate_order_results($count, 'Title', $session);       //"商品一|商品二";
-    $ItemCount =  spgateway_separate_order_results($count, 'Item Count', $session);  // "1|2";
-    $ItemUnit =   spgateway_separate_order_results($count, 'Item Unit', $session);  // "個|個";
-    $ItemPrice =  spgateway_separate_order_results($count, 'Price', $session); //"300|100";
-    $ItemAmt =    spgateway_separate_order_results($count, 'Item Amount', $session); //"300|200";
-    $Comment = "";
-    $Status = "1";
-    $CreateStatusTime = '';
-    $NotifyEmail =   ($data->enable === true) ? 1 : 0;
-    $BuyerAddress = $billingAddressArray['address_1']; //. ', ' . $billingAddressArray['address_2'] . ', ' .  $billingAddressArray['city'] . ', ' .  $billingAddressArray['city'] . ', ' .  $billingAddressArray['postcode'] . ', ' . $billingAddressArray['country'];
-
-    $testData = [
-        "RespondType" => "JSON",
-        "Version" => "1.4",
-        "TimeStamp" => time(), //請以  time()  格式
-        "TransNum" => $post['TradeNo'],
-        "MerchantOrderNo" => $post['MerchantOrderNo'],  //"201409170000009",
-        "BuyerName" =>$buyerName, ///$order->get_formatted_billing_full_name(),
-        "BuyerUBN" => $buyerUbn,
-        "BuyerAddress" => $BuyerAddress,
-        "BuyerEmail" => $order->billing_email,
-        "BuyerPhone" => $order->billing_phone,
-        "Category" => $Category,
-        "TaxType" => $TaxType,
-        "TaxRate" => $TaxRate,
-        "Amt" => $Amt,
-        "TaxAmt" => $TaxAmt,
-        "TotalAmt" => $TotalAmt,
-        "CarrierType" => $CarrierType,
-        "CarrierNum" => $CarrierNum,
-        "LoveCode" => $LoveCode,
-        "PrintFlag" => $PrintFlag,
-        "ItemName" => $ItemName, //多項商品時，以「|」分開
-        "ItemCount" => $ItemCount, //多項商品時，以「|」分開
-        "ItemUnit" => $ItemUnit, //多項商品時，以「|」分開
-        "ItemPrice" => $ItemPrice, //多項商品時，以「|」分開
-        "ItemAmt" => $ItemAmt, //多項商品時，以「|」分開
-        "Comment" => $Comment,
-        "Status" => $Status, //1=立即開立，0=待開立，3=延遲開立
-        "CreateStatusTime" => $CreateStatusTime,
-        "NotifyEmail" => $NotifyEmail, //1=通知，0=不通知
-    ];
-
-    $data->setParameter($testData);
-        // print "<pre>";
-        // print_r($testData);
-        // print_r($data->post_data_array);
-        // print "</pre>";
-        $data->postInvoice();
-        // print "exit???";
-        // exit;
-}
-
-function spgateway_separate_order_results($count, $fieldName, $post) {
-
-    $str = '';
-
-    // print " count  $count field name  $fieldName ";
-
-    for($i=1; $i<=$count; $i++) {
-
-        if($fieldName == 'Item Count') {
-            $str .=  $post['Qty' . $i];
-        } else if($fieldName == 'Item Unit') {
-            $str .= '個';
-        } else if ($fieldName == 'Item Amount') {
-            $quantity     = $post['Qty' . $i];
-            $price        = $post['Price' . $i];
-            $subTotal     = $quantity * $price;
-            $str         .= $subTotal;
-        } else {
-            $str .= $post[$fieldName . $i];
-        }
-
-        if ($i != $count) {
-            $str .= '|';
-        }
-
-//        print " field name $fieldName i $i count $count ";
-    }
-//     print " str compose  1 " . $str . ' count ' . $count . ' field name ' . $fieldName;
-
-//    exit;
-
-//    print " title " . $str ;
-
-
-
-    return $str;
-
 }
 
 function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message)
@@ -224,18 +111,19 @@ function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderI
 }
 
 function spgateway_mr_redirect_to_thankyou_page_theme($product_id) {
-    // print " product id " . $product_id  . ' <br>';
+//     print " product id " . $product_id  . ' <br>';
     $thank_you_page_id = get_post_meta($product_id, 'thankyou_page', true);
-    // print " page id " . $thank_you_page_id . ' <br>';
+//     print " page id " . $thank_you_page_id . ' <br>';
     $url = get_permalink( $thank_you_page_id );
     // $post_7 = get_post( $thank_you_page_id );
     // $url = $post_7->guid;
-    // print "redirect to url $url";
+//     print "redirect to url $url";
 //     exit;
     ?>
     <script>
         //            setTimeout(
         //                function(){
+        //        alert('<?php //print $url; ?>//');
         document.location ='<?php print $url; ?>';
         //                },3000);
     </script>
@@ -268,7 +156,7 @@ function payshortcut_create_member_and_order()
     $postOrder = [
         'status' => $post['Message'] . ' - ' . $post['Status'], // 'success',
         'merchant_id' => $post['MerchantID'], //'1234567',
-        'title' => spgateway_separate_order_results($count, 'Title', $session['spgateway_args']) ,
+        'title' => helper_spgateway_separate_order_results($count, 'Title', $session['spgateway_args']) ,
         'description' =>  '',
         'version' =>  '1.1',
         'response_type' => $post['RespondType'], //'String',
@@ -282,7 +170,7 @@ function payshortcut_create_member_and_order()
         'token_value' => $post['TokenValue'], //'2asdasd',
         'token_life' => $post['TokenLife'], // '1233232',
         'content_post' => serialize($post),
-        'content_session' => serialize($session), 
+        'content_session' => serialize($session),
     ];
 
     $payShortCut = new PayShortCut();
