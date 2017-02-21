@@ -282,8 +282,7 @@ function payshortcut_create_member_and_order()
         'token_value' => $post['TokenValue'], //'2asdasd',
         'token_life' => $post['TokenLife'], // '1233232',
         'content_post' => serialize($post),
-        'content_session' => serialize($session),
-
+        'content_session' => serialize($session), 
     ];
 
     $payShortCut = new PayShortCut();
@@ -293,9 +292,9 @@ function payshortcut_create_member_and_order()
         $postOrder
     );
 
-//    print "<pre>";
-//    print "<br>response information <br>";
-//    print_r($postOrder);
-//    print_r($response);
+    //    print "<pre>";
+    //    print "<br>response information <br>";
+    //    print_r($postOrder);
+    //    print_r($response);
     return $response;
 }
