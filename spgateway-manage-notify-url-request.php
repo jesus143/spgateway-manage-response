@@ -11,8 +11,11 @@ require_once( ABSPATH . "wp-includes/post.php" );
 $orderId = $_GET['order_id'];
 
 // set order completed
-helper_spgateway_pay2go_invoice_set_order_completed($orderId);
+$order = new WC_Order($orderId);
+$order->update_status('complete');
 
+// set order completed
+//helper_spgateway_pay2go_invoice_set_order_completed($orderId);
 //exit;
 // get the session and post status saved in wp_postmeta during manage response spgateway processed order
 // and unserialized the result so that it can be called as the orginal text format like array.
