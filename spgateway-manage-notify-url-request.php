@@ -12,7 +12,7 @@ $orderId = $_GET['order_id'];
 
 // set order completed
 $order = new WC_Order($orderId);
-$order->update_status('complete');
+$order->update_status('completed');
 
 // set order completed
 //helper_spgateway_pay2go_invoice_set_order_completed($orderId);

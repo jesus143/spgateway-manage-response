@@ -11,6 +11,7 @@ $status     = strtolower($_POST['Status']);
 $orderId    = $_POST['MerchantOrderNo'];
 $message    = $_POST['Message'];
 
+print "<b>please wait...</b>";
 
 //print "<pre>";
 
@@ -28,7 +29,7 @@ payshortcut_create_member_and_order();
 /**
  * clean item and set product to processing
  */
-spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message);
+spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId);
 
 /**
  * Send order email status to admin and customer
@@ -45,7 +46,7 @@ helper_spgateway_pay2go_invoice_trigger_invoice($orderId, $_SESSION, $_POST);
 /**
  * redirect to thank you page
  */
-spgateway_mr_redirect_to_thankyou_page_theme($product_id);
+ spgateway_mr_redirect_to_thankyou_page_theme($product_id);
 
 function spgateway_woocomerce_send_email_notifications()
 {
@@ -109,14 +110,14 @@ function spgateway_payment_response_func_theme()
     //    $product_id     = 197;
     //    $message        = 'Authenticated';
 
-    //     print "<pre>";
-    //         print "post";
-    //         print_r($_POST);
-    //         PRINT_R($_SESSION);
-    //         print "cookie";
-    //         PRINT_R($_COOKIE);
-    //     print "</pre>";
-    //    print "session";
+//         print "<pre>";
+//             print "post";
+//             print_r($_POST);
+//             PRINT_R($_SESSION);
+//             print "cookie";
+//             PRINT_R($_COOKIE);
+//         print "</pre>";
+//        print "session";
 
 
 
@@ -151,7 +152,7 @@ function spgateway_payment_response_func_theme()
 
 }
 
-function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId, $message)
+function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderId)
 {
     if ($status == 'success') {
 
@@ -172,8 +173,8 @@ function spgateway_mr_set_order_processing_and_empty_cart_theme($status, $orderI
 
         // trgger complete emaail
 
-        unset($_SESSION['user']['user_id']);
-        unset($_SESSION['spgateway_args']['Pid1']);
+//        unset($_SESSION['user']['user_id']);
+//        unset($_SESSION['spgateway_args']['Pid1']);
 
     } else {
 
@@ -202,6 +203,7 @@ function spgateway_mr_redirect_to_thankyou_page_theme($product_id) {
         //            setTimeout(
         //                function(){
         //        alert('<?php //print $url; ?>//');
+        //        alert("redirect to thank you page now ");
         document.location ='<?php print $url; ?>';
         //                },3000);
     </script>
